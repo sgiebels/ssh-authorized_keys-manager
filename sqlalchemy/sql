@@ -1,0 +1,37 @@
+CREATE TABLE ssh_accounts (
+	id INTEGER NOT NULL, 
+	user VARCHAR NOT NULL, 
+	host VARCHAR NOT NULL, 
+	owned_hardware BOOLEAN, 
+	use_become BOOLEAN, 
+	PRIMARY KEY (id)
+);
+INSERT INTO ssh_accounts VALUES(1,'user','laptop',1,0);
+INSERT INTO ssh_accounts VALUES(2,'root','laptop',1,1);
+CREATE TABLE ssh_pubkeys (
+	id INTEGER NOT NULL, 
+	"user@host" VARCHAR NOT NULL, 
+	ssh_pubkey VARCHAR NOT NULL, 
+	ssh_pubkey_date INTEGER, 
+	is_tpm BOOLEAN, 
+	ssh_pubkey_comment VARCHAR, 
+	last_applied_to_account_date INTEGER, 
+	PRIMARY KEY (id)
+);
+INSERT INTO ssh_pubkeys VALUES(1,'me@laptop','ssh-rsa AAAAB3Nza',20231007,0,'',20260208);
+INSERT INTO ssh_pubkeys VALUES(2,'root@laptop','ssh-rsa AAAAB3Nzz',20231007,0,'',20260208);
+INSERT INTO ssh_pubkeys VALUES(3,'root@server','ssh-rsa AAAAB2svNSc=',20210901,0,'',20260208);
+CREATE TABLE ssh_authorizations (
+	id INTEGER NOT NULL, 
+	ssh_account_id INTEGER, 
+	ssh_pubkey_id INTEGER, 
+	forced_command VARCHAR, 
+	update_date INTEGER, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(ssh_account_id) REFERENCES ssh_accounts (id), 
+	FOREIGN KEY(ssh_pubkey_id) REFERENCES ssh_pubkeys (id)
+);
+INSERT INTO ssh_authorizations VALUES(1,1,1,'',19700101);
+INSERT INTO ssh_authorizations VALUES(2,2,2,'cat /proc/cpuid',20260221);
+INSERT INTO ssh_authorizations VALUES(3,2,1,'cat /proc/cpuid',20260222);
+COMMIT;
